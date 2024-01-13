@@ -16,10 +16,12 @@ use App\Http\Controllers\SignupController;
 
 Route::get('/', function () {
     return view('auth.register');
-})->middleware('guest');
+})->middleware('guest')->name('register');
 
 Route::controller(SignupController::class)->group(function () {
     Route::post('/register', 'register')->name('store');
+    Route::get('/login', 'login')->name('login');
+    Route::post('/login-post', 'LoginPost')->name('loginPost');
     Route::post('/logout', 'logout')->name('logout');
-    Route::get('/profile/{slug}', 'profile')->middleware('auth')->name('profile.slug');
+    Route::get('/dashboard', 'dashboard')->middleware('auth')->name('dashboard');
 });

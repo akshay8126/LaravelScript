@@ -8,6 +8,7 @@ use App\Models\User;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Auth;
+use App\Http\Requests\LoginRequest;
 
 
 class SignupController extends Controller
@@ -23,24 +24,33 @@ class SignupController extends Controller
         ]);
 
         Auth::login($user);
-        $slug = Str::slug($user->name);
-
-        return redirect()->route('profile.slug', $slug)->with('success', 'Your Account Register Successfully.');
-    }
-
-    public function profile($slug)
-    {
-        if (str_replace('-', ' ', $slug) == strtolower(Auth::user()->name)) {
-            return view('welcome');
-        } else {
-            $slug = Str::slug(Auth::user()->name);
-            return redirect()->route('profile.slug', $slug);
-        }
+        return redirect()->route('dashboard')->with('success', 'Account Created Successfully.');
     }
 
     public function logout()
     {
         Auth::logout();
         return redirect('/')->with('success', 'Logout Successfully.');
+    }
+
+    public function login()
+    {
+        return view('auth.login');
+    }
+
+    public function LoginPost(LoginRequest $request)
+    {
+        $credentilas = $request->only(['email', 'password']);
+        if (Auth::attempt($credentilas)) {
+            $request->session()->regenerate();
+            return redirect()->route('dashboard')->with('success', 'Account Login Successfully.');
+        } else {
+            return back()->withInput()->withErrors(['password' => 'Wrong password']);
+        }
+    }
+
+    public function dashboard()
+    {
+        return view('welcome');
     }
 }
